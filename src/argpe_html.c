@@ -208,22 +208,31 @@ void set_html_text(argpe_string text)
 
 	if (relation == ELEMENT_CHILD) {
 		node1 = parser_node->text;
+
+		if (node1 == NULL){
+			parser_node->text = node2;
+		}
+		else {
+			while (node1->next != NULL) {
+				node1 =  node1->next;
+			}
+			node1->next = node2;
+		}
 	} 
 	else /*(relation == ELEMENT_SIBLING)*/ {
 		node1 = parser_node->parent->text;
-	}
 
-	if (node1 == NULL){
-		parser_node->text = node2;
-	}
-	else {
-		while (node1->next != NULL) {
-			node1 =  node1->next;
+		if (node1 == NULL){
+			parser_node->parent->text = node2;
 		}
-		node1->next = node2;
+		else {
+			while (node1->next != NULL) {
+				node1 =  node1->next;
+			}
+			node1->next = node2;
+		}
 	}
 	return;
-
 }
 
 void set_html_attr(argpe_string attr)
@@ -309,7 +318,6 @@ argpe_html_tokenizer (const argpe_string stream, const argpe_string token)
 	char data;
 
 	argpe_strforeach (stream, data) {
-
 		switch (PARSER_STATE) {
 		case STATE_DATA:
 			/*if (data == '&') { //TODO: Convertire l'entità
@@ -321,7 +329,7 @@ argpe_html_tokenizer (const argpe_string stream, const argpe_string token)
 				if (parser_strlen > 0) {
 					parser_str = argpe_substr_space(token,
 					 parser_strlen + parser_spacelen + parser_newline);
-					//printf(" TEXT: '%s':%d\n", parser_str, parser_strlen);
+					//printf(" TEXT: '%s':%d\n", parser_str, parser_strlen); // DEBUG
 					set_html_text(parser_str);
 					parser_spacelen = 0;
 					parser_newline = 0;

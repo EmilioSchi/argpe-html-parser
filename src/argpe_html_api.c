@@ -63,10 +63,12 @@ void print_text (html_element node)
 	while (node) {
 		sibling = node->sibling;
 
-		text = node->text;
-		while (text != NULL) {
-			printf("%s ", text->text);
-			text = text->next;
+		if (!argpe_strcmp(node->tag, "script")) {
+			text = node->text;
+			while (text != NULL) {
+				printf("%s ", text->text);
+				text = text->next;
+			}
 		}
 
 		print_text(node->child);
