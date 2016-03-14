@@ -53,6 +53,29 @@ Written by Emilio Schininà <emilioschi@gmail.com>, March 2016
 
 #include "argpe_html.h"
 
+void print_text (html_element node)
+{
+	html_element	sibling;
+	html_text	text;
+
+	if(!node)
+		return;
+	while (node) {
+		sibling = node->sibling;
+
+		text = node->text;
+		while (text != NULL) {
+			printf("%s ", text->text);
+			text = text->next;
+		}
+
+		print_text(node->child);
+
+		node = sibling;
+	}
+	return;
+}
+
 void print_element(html_element node)
 {
 	html_attribute	attr;

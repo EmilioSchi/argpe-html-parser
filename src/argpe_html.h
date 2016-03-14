@@ -134,6 +134,7 @@ struct html_element_s {
 	html_element	sibling;
 };
 
+
 html_element init_html_three();
 html_element argpe_parser_html (FILE*);
 const argpe_string argpe_html_tokenizer (const argpe_string, const argpe_string);
@@ -146,20 +147,18 @@ void set_html_text(argpe_string);
 void set_html_attr(argpe_string);
 void set_html_value(argpe_string);
 
+/* ARGPE_HTML_API.C DEPENDENT FUNCTIONS */
+void html_print_three_recursive(html_element, argpe_uint);
+html_element find_tag_recursive (html_element, argpe_string);
+html_element find_attr_recursive (html_element, argpe_string);
 
 /* API */
 void argpe_html_print_three(html_element);
-void html_print_three_recursive(html_element, argpe_uint);
-
 void argpe_html_prettify(html_element);
 void html_print_recursive(html_element, argpe_uint);
-
 void print_element(html_element);
-
-html_element find_tag_recursive (html_element, argpe_string);
+void print_text (html_element);
 html_element find_tag (html_element, argpe_string);
-
-html_element find_attr_recursive (html_element, argpe_string);
 html_element find_attr (html_element, argpe_string);
 
 

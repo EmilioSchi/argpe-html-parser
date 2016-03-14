@@ -262,7 +262,6 @@ void html_free_three_recursive (html_element node)
 	html_text	text;
 	html_text	freetext;
 
-
 	if(!node)
 		return;
 	while (node) {
@@ -290,7 +289,6 @@ void html_free_three_recursive (html_element node)
 
 		freesibling = sibling;
 		node = sibling;
-		argpe_save_free(freesibling);
 	}
 	argpe_save_free(node);
 	return;
