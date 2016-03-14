@@ -6,7 +6,7 @@ int main (int argc, char* argv[])
 	FILE *f;
 
 	if (argc != 2) {
-		fprintf(stderr, "usage: printthree <file.html>\n");
+		fprintf(stderr, "usage: findtag <file.html>\n");
 		return 1;
 	}
 
@@ -16,7 +16,8 @@ int main (int argc, char* argv[])
 	}
 
 	html_doc doc = argpe_parser_html(f);
-	argpe_html_print_three(doc);
+	html_element a = find_tag(doc, "a");
+	print_element(a);
 	argpe_html_close(doc);
 
 	fclose(f);

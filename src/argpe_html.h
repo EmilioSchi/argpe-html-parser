@@ -118,8 +118,11 @@ struct html_text_s {
 	html_text	next;
 };
 
+
 typedef	struct html_element_s	html_element_t;
 typedef	html_element_t*	html_element;
+typedef	html_element	html_doc;
+
 struct html_element_s {
 	argpe_string	tag;
 	html_text	text;
@@ -150,5 +153,14 @@ void html_print_three_recursive(html_element, argpe_uint);
 
 void argpe_html_prettify(html_element);
 void html_print_recursive(html_element, argpe_uint);
+
+void print_element(html_element);
+
+html_element find_tag_recursive (html_element, argpe_string);
+html_element find_tag (html_element, argpe_string);
+
+html_element find_attr_recursive (html_element, argpe_string);
+html_element find_attr (html_element, argpe_string);
+
 
 #endif /* __ARGPE_HTML_H_ */

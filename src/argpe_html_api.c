@@ -53,14 +53,106 @@ Written by Emilio Schininà <emilioschi@gmail.com>, March 2016
 
 #include "argpe_html.h"
 
-void find_tag()
+void print_element(html_element node)
 {
+	html_attribute	attr;
+	html_text	text;
 
+	if (!node){
+		printf("element: Not Found\n");
+		return;
+	}
+
+	printf("element: %s", node->tag);
+	printf("\n");
+
+	text = node->text;
+	while (text != NULL) {
+		printf("text: %s\n", text->text);
+		text = text->next;
+	}
+
+	attr = node->attribute;
+	while (attr != NULL) {
+		printf("attribute: %s=", attr->key_name);
+		if (attr->value) 
+			printf("\"%s\"", attr->value);
+		else 
+			printf("\"\"");
+		printf("\n");
+		attr = attr->next;
+	}
+	return;
 }
 
-void find_attr()
+html_element find_tag_recursive (html_element node, argpe_string foundtag)
 {
+	argpe_bool	found = False;
+	html_element	foundnode = NULL;
+	html_element	sibling;
 
+	if(!node)
+		return foundnode;
+	while (node) {
+		sibling = node->sibling;
+
+		if (argpe_strcmp(node->tag, foundtag)) {
+			foundnode = node;
+			found = True;
+			return foundnode;
+		}
+
+		if (!found)
+			foundnode = find_tag_recursive (node->child, foundtag);
+
+		node = sibling;
+	}
+	return foundnode;
+}
+
+html_element find_tag (html_element node, argpe_string tag)
+{
+	html_element found;
+	found = find_tag_recursive(node->child, tag);
+	return found;
+}
+
+
+html_element find_attr_recursive (html_element node, argpe_string foundattr)
+{
+	argpe_bool	found = False;
+	html_element	foundnode = NULL;
+	html_attribute	attr;
+	html_element	sibling;
+
+	if(!node)
+		return foundnode;
+	while (node) {
+		sibling = node->sibling;
+
+		attr = node->attribute;
+		while (attr != NULL) {
+			if (argpe_strcmp(attr->key_name, foundattr)) {
+				foundnode = node;
+				found = True;
+				return foundnode;			
+			}
+			attr = attr->next;
+		}
+
+		if (!found)
+			foundnode = find_attr_recursive (node->child, foundattr);
+
+		node = sibling;
+	}
+	return foundnode;
+}
+
+html_element find_attr (html_element node, argpe_string attr)
+{
+	html_element found;
+	found = find_attr_recursive(node->child, attr);
+	return found;
 }
 
 void html_print_three_recursive (html_element node, argpe_uint level)

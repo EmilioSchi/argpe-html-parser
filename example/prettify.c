@@ -15,7 +15,7 @@ int main (int argc, char* argv[])
 		return 1;
 	}
 
-	html_element doc = argpe_parser_html(f);
+	html_doc doc = argpe_parser_html(f);
 	argpe_html_prettify(doc);
 	argpe_html_close(doc);
 
