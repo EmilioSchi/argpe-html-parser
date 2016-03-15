@@ -53,6 +53,39 @@ Written by Emilio Schininà <emilioschi@gmail.com>, March 2016
 
 #include "argpe_html.h"
 
+
+void print_sort_text_algorithm (html_element root, html_element node, argpe_uint sort)
+{
+	html_element	sibling;
+	html_text	text;
+
+	if(!node)
+		return;
+	while (node) {
+		sibling = node->sibling;
+
+		text = node->text;
+		while (text != NULL) {
+			if (sort == text->sort){
+				if (!argpe_strcmp(node->tag, "script"))
+					fprintf(stderr,"%s ", text->text);
+				print_sort_text_algorithm (root, root, sort + 1);
+				return;
+			}
+			text = text->next;
+		}
+
+		print_sort_text_algorithm (root, node->child, sort);
+		node = sibling;
+	}
+	return;
+}
+
+void print_sort_text (html_element node)
+{
+	print_sort_text_algorithm (node, node, 0);
+}
+
 void print_text (html_element node)
 {
 	html_element	sibling;
@@ -200,7 +233,7 @@ void html_print_three_recursive (html_element node, argpe_uint level)
 		while (text != NULL) {
 			for(int i = 0; i < level; i++)
 				printf("\t");
-			printf("text: %s\n", text->text);
+			printf("text: %s sort: %u\n", text->text, text->sort);
 			text = text->next;
 		}
 

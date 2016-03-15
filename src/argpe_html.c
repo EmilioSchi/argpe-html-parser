@@ -68,7 +68,6 @@ int doctype = 0;
 int cdata = 0;
 
 argpe_uint parser_strlen = 0;
-argpe_uint parser_newline = 0;
 argpe_uint parser_spacelen = 0; 
 argpe_string parser_str = NULL;
 
@@ -201,14 +200,16 @@ void set_html_tag(argpe_string tag)
 
 void set_html_text(argpe_string text)
 {
+	static argpe_uint sort = 0;
+
 	html_text node1;
 	html_text node2 = (html_text)malloc(sizeof(html_text_t));
 	node2->text = argpe_substr(text, argpe_strlen(text));
+	node2->sort = sort;
 	node2->next = NULL;
 
 	if (relation == ELEMENT_CHILD) {
 		node1 = parser_node->text;
-
 		if (node1 == NULL){
 			parser_node->text = node2;
 		}
@@ -221,7 +222,6 @@ void set_html_text(argpe_string text)
 	} 
 	else /*(relation == ELEMENT_SIBLING)*/ {
 		node1 = parser_node->parent->text;
-
 		if (node1 == NULL){
 			parser_node->parent->text = node2;
 		}
@@ -232,6 +232,8 @@ void set_html_text(argpe_string text)
 			node1->next = node2;
 		}
 	}
+
+	sort++;
 	return;
 }
 
@@ -327,25 +329,19 @@ argpe_html_tokenizer (const argpe_string stream, const argpe_string token)
 			else */
 			if (data == '<') {
 				if (parser_strlen > 0) {
-					parser_str = argpe_substr_space(token,
-					 parser_strlen + parser_spacelen + parser_newline);
+					parser_str = argpe_substr_space(token, parser_strlen + parser_spacelen);
 					//printf(" TEXT: '%s':%d\n", parser_str, parser_strlen); // DEBUG
 					set_html_text(parser_str);
 					parser_spacelen = 0;
-					parser_newline = 0;
 				}
 					parser_strlen++;
 					parser_spacelen = 0;
-					parser_newline = 0;
 					PARSER_STATE = STATE_TAG_OPEN;
 			}
-			else if (data == '\r' || data == '\n' || data == '\f' ){
-				parser_newline++;
-			}
-			else if (data == ' ' || data == '\t' || data == '\v'){
+			else if (argpe_isspace(data)) {
 				parser_spacelen++;
 			}
-			else{
+			else {
 				parser_strlen++;
 			}
 			break;
@@ -372,7 +368,7 @@ argpe_html_tokenizer (const argpe_string stream, const argpe_string token)
 				SET_HTML_TOKEN_OFFSET;
 				PARSER_STATE = STATE_BOGUS_COMMENT;
 			}
-			else{
+			else {
 				parser_strlen++;
 				PARSER_STATE = STATE_DATA;
 			}

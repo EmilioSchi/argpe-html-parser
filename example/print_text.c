@@ -16,9 +16,7 @@ int main (int argc, char* argv[])
 	}
 
 	html_doc doc = argpe_parser_html(f);
-
-	print_text(doc);
-
+	print_sort_text(doc);
 	argpe_html_close(doc);
 
 	fclose(f);

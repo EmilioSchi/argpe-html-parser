@@ -114,6 +114,7 @@ typedef struct html_text_s html_text_t;
 typedef	html_text_t*	html_text;
 struct html_text_s {
 	argpe_string	text;
+	argpe_uint	sort;
 
 	html_text	next;
 };
@@ -160,6 +161,9 @@ void print_element(html_element);
 void print_text (html_element);
 html_element find_tag (html_element, argpe_string);
 html_element find_attr (html_element, argpe_string);
+
+void print_sort_text_algorithm (html_element, html_element, argpe_uint);
+void print_sort_text (html_element);
 
 
 #endif /* __ARGPE_HTML_H_ */
