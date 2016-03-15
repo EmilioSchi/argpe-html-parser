@@ -233,7 +233,7 @@ void html_print_three_recursive (html_element node, argpe_uint level)
 		while (text != NULL) {
 			for(int i = 0; i < level; i++)
 				printf("\t");
-			printf("text: %s sort: %u\n", text->text, text->sort);
+			printf("text: \"%s\" sort: %u\n", text->text, text->sort);
 			text = text->next;
 		}
 
@@ -288,9 +288,7 @@ void html_print_recursive (html_element node, argpe_uint level)
 
 			attr = attr->next;
 		}
-
 		printf(">\n");
-
 
 		text = node->text;
 		while (text != NULL) {

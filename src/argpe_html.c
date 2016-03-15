@@ -62,13 +62,13 @@ html_element	parser_root;
 html_element	parser_node;
 html_attribute	parser_attr;
 
-static parser_state PARSER_STATE = STATE_DATA;
-int comment = 0;
-int doctype = 0;
-int cdata = 0;
+static parser_state PARSER_STATE;
+int comment;
+int doctype;
+int cdata;
 
-argpe_uint parser_strlen = 0;
-argpe_uint parser_spacelen = 0; 
+argpe_uint sort;
+argpe_uint parser_strlen, parser_spacelen; 
 argpe_string parser_str = NULL;
 
 
@@ -130,23 +130,30 @@ html_element argpe_parser_html (FILE *fd)
 }
 
 
-html_element init_html_three () /* DUMMY NODE */
+html_element init_html_three () 
 {
+	/* Parser variables */
+	PARSER_STATE = STATE_DATA;
+	comment = 0;
+	doctype = 0;
+	cdata = 0;
+
+	sort = 0;
+	parser_strlen = 0;
+	parser_spacelen = 0; 
+	parser_str = NULL;
+
+	/* Root dummy node */
 	html_element node	 = (html_element)malloc(sizeof(html_element_t));
-
 	node->tag		 = "root";
-
 	node->text		 = NULL;
 	node->attribute		 = NULL;
-
 	node->parent		 = NULL;
 	node->child		 = NULL;
 	node->sibling		 = NULL;
-
 	node->close		 = True;
 
 	relation		 = ELEMENT_CHILD;
-
 	parser_root 		 = node;
 
 	return node;
@@ -172,7 +179,7 @@ void close_html_tag (html_element node, argpe_string tag)
 void set_html_tag(argpe_string tag)
 {
 	//printf("ADD TAG: '%s'\n", tag); // DEBUG
-	if (argpe_strncmp("/*", tag, 1)) { // TODO: Fix later
+	if (argpe_strncmp("/*", tag, 1)) { // TODO: Fix later (MAYBE... Now code working) 
 		tag = tag + 1; // <----------- if (tag[0] == 0) relation = ELEMENT_SIBLING;
 		close_html_tag(parser_root->child, tag);
 		// if (False) { relation == ELEMENT_CHILD } else
@@ -207,7 +214,7 @@ void set_html_tag(argpe_string tag)
 
 void set_html_text(argpe_string text)
 {
-	static argpe_uint sort = 0;
+
 	//printf("ADD TEXT: %s SORT: %u\n", text, sort); // DEBUG
 	html_text node1;
 	html_text node2 = (html_text)malloc(sizeof(html_text_t));
@@ -216,6 +223,9 @@ void set_html_text(argpe_string text)
 	node2->next = NULL;
 
 	if (relation == ELEMENT_CHILD) {
+		if (argpe_strcmp(parser_node->tag, "root"))
+			return;
+
 		node1 = parser_node->text;
 		if (node1 == NULL){
 			parser_node->text = node2;
@@ -228,6 +238,8 @@ void set_html_text(argpe_string text)
 		}
 	}
 	else /*(relation == ELEMENT_SIBLING)*/ {
+		if (argpe_strcmp(parser_node->parent->tag, "root"))
+			return;
 		node1 = parser_node->parent->text;
 		if (node1 == NULL){
 			parser_node->parent->text = node2;
@@ -703,7 +715,7 @@ argpe_html_tokenizer (const argpe_string stream, const argpe_string token)
 					cdata = 0;
 				}
 			}
-			else {
+			else { /* TODO: Check This with hard test! */
 				parser_strlen++;
 				comment = 0;
 				doctype = 0;
