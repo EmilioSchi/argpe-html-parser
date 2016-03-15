@@ -133,6 +133,8 @@ struct html_element_s {
 	html_element	parent;
 	html_element	child;
 	html_element	sibling;
+
+	argpe_bool close;
 };
 
 

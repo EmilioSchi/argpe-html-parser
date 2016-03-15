@@ -143,6 +143,8 @@ html_element init_html_three () /* DUMMY NODE */
 	node->child		 = NULL;
 	node->sibling		 = NULL;
 
+	node->close		 = True;
+
 	relation		 = ELEMENT_CHILD;
 
 	parser_root 		 = node;
@@ -158,8 +160,9 @@ void close_html_tag (html_element node, argpe_string tag)
 		return;
 	while (node) {
 		sibling = node->sibling;
-		if (argpe_strcmp(tag, node->tag))
+		if (argpe_strcmp(tag, node->tag) && !node->close){
 			parser_node = node;
+		}
 		close_html_tag (node->child, tag);
 		node = sibling;
 	}
@@ -168,10 +171,12 @@ void close_html_tag (html_element node, argpe_string tag)
 
 void set_html_tag(argpe_string tag)
 {
+	//printf("ADD TAG: '%s'\n", tag); // DEBUG
 	if (argpe_strncmp("/*", tag, 1)) { // TODO: Fix later
 		tag = tag + 1; // <----------- if (tag[0] == 0) relation = ELEMENT_SIBLING;
 		close_html_tag(parser_root->child, tag);
 		// if (False) { relation == ELEMENT_CHILD } else
+		parser_node->close = True;
 		relation = ELEMENT_SIBLING;
 	}
 	else {
@@ -183,6 +188,8 @@ void set_html_tag(argpe_string tag)
 		node->parent = NULL;
 		node->child = NULL;
 		node->sibling = NULL;
+
+		node->close = False;
 
 		if (relation == ELEMENT_CHILD) {
 			parser_node->child = node;
@@ -201,7 +208,7 @@ void set_html_tag(argpe_string tag)
 void set_html_text(argpe_string text)
 {
 	static argpe_uint sort = 0;
-
+	//printf("ADD TEXT: %s SORT: %u\n", text, sort); // DEBUG
 	html_text node1;
 	html_text node2 = (html_text)malloc(sizeof(html_text_t));
 	node2->text = argpe_substr(text, argpe_strlen(text));
@@ -219,7 +226,7 @@ void set_html_text(argpe_string text)
 			}
 			node1->next = node2;
 		}
-	} 
+	}
 	else /*(relation == ELEMENT_SIBLING)*/ {
 		node1 = parser_node->parent->text;
 		if (node1 == NULL){
@@ -320,6 +327,7 @@ argpe_html_tokenizer (const argpe_string stream, const argpe_string token)
 	char data;
 
 	argpe_strforeach (stream, data) {
+		//printf("STATE: %2d  CHAR:'%c'\n", PARSER_STATE, data); // DEBUG
 		switch (PARSER_STATE) {
 		case STATE_DATA:
 			/*if (data == '&') { //TODO: Convertire l'entità
